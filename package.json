@@ -1,0 +1,33 @@
+{
+  "name": "backbone-mongo",
+  "version": "0.0.0",
+  "description": "An extension of Backbone Collection, query-able with the mongodb api",
+  "main": "lib/backbone-mongo-collection.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "grunt test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/alexhancock/backbone-mongo.git"
+  },
+  "keywords": [
+    "backbone",
+    "mongo",
+    "query",
+    "syntax",
+    "meteor"
+  ],
+  "author": "Alex J Hancock",
+  "license": "BSD",
+  "bugs": {
+    "url": "https://github.com/alexhancock/backbone-mongo/issues"
+  },
+  "devDependencies": {
+    "grunt-cli": "~0.1.9",
+    "grunt": "~0.4.1",
+    "grunt-karma": "~0.4.5"
+  }
+}
