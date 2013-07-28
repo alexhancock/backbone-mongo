@@ -10,4 +10,4 @@ collection.update({ name: 'Alex' }, { $inc: { score: 10 }, $set: { name: 'George
 setTimeout(function(){
   var george = collection.findOne({ name: 'George' });
   george.set('score', 100);
-}, 4000);
+}, 3000);
