@@ -385,5 +385,279 @@ define(function(require){
       assert.equal(coll.store.find().count(), 1);
       assert.equal(coll.models.length, 1);
     });
+
+    describe('Underscore aliased methods', function(){
+      beforeEach(function(){
+        coll.insert({ name: 'Alex', score: 5 });
+        coll.insert({ name: 'Barack', score: 10 });
+      });
+
+      it('implements the aliased underscore (for)Each', function(){
+        assert.isFunction(coll.each);
+        assert.isFunction(coll.forEach);
+        coll.forEach(function(doc){
+          assert.isDefined(doc.get('score'));
+        });
+      });
+
+      it('implements the aliased underscore map', function(){
+        assert.isFunction(coll.map);
+        var agg = coll.map(function(doc){
+          return doc.get('name');
+        });
+
+        assert.sameMembers(['Alex', 'Barack'], agg);
+      });
+      it('implements the aliased underscore reduce/foldl/inject', function(){
+        assert.isFunction(coll.reduce);
+        assert.isFunction(coll.foldl);
+        assert.isFunction(coll.inject);
+
+        var sumOfScores = coll.reduce(function(memo, doc){
+          return memo + doc.get('score');
+        }, 0);
+
+        assert.equal(sumOfScores, 15);
+      });
+      it('implements the aliased underscore foldr/reduceRight', function(){
+        assert.isFunction(coll.reduceRight);
+        assert.isFunction(coll.foldr);
+
+        var sumOfScores = coll.reduceRight(function(memo, doc){
+          return memo + doc.get('score');
+        }, 0);
+
+        assert.equal(sumOfScores, 15);
+      });
+      it('does not use the default underscore aliased find - making use of the minimongo implementation instead', function(){
+        assert.isFunction(coll.find);
+        
+        var found = coll.find({ score: 5 });
+        assert.equal(found[0].get('score'), 5);
+
+        var scoresOver6 = coll.find({ score: { $gt: 6 } });
+        assert.lengthOf(found, 1);
+      });
+
+      it('implements the aliased underscore filter', function(){
+        assert.isFunction(coll.filter);
+        
+        var filtered = coll.filter(function(doc){
+          return doc.get('score') % 10 === 0;
+        });
+
+        assert.lengthOf(filtered, 1);
+        _.each(filtered, function(doc){
+          assert.equal(doc.get('name'), 'Barack');
+        });
+      });
+
+      it('implements the aliased underscore reject', function(){
+        assert.isFunction(coll.reject);
+        
+        var without = coll.reject(function(doc){
+          return doc.get('score') === 5;
+        });
+
+        assert.lengthOf(without, 1);
+        _.each(without, function(doc){
+          assert.equal(doc.get('name'), 'Barack');
+        });
+      });
+
+      it('implements the aliased underscore every/all', function(){
+        assert.isFunction(coll.every);
+        assert.isFunction(coll.all);
+        
+        var all = coll.every(function(doc){
+          return doc.get('score') > 4;
+        });
+        assert.isTrue(all);
+      });
+
+      it('implements the aliased underscore any/some', function(){
+        assert.isFunction(coll.any);
+        assert.isFunction(coll.some);
+        
+        var someMatch = coll.any(function(doc){
+          return doc.get('name', 'Alex');
+        });
+
+        assert.isTrue(someMatch);
+      });
+
+      it('implements the aliased underscore contains/include', function(){
+        assert.isFunction(coll.contains);
+        assert.isFunction(coll.include);
+
+        var first = coll.at(0); // Somewhat contrived, but it still tests no one overrides this implementation
+        var contained = coll.contains(first);
+
+        assert.isTrue(contained);
+      });
+
+      it('implements the aliased underscore invoke', function(){
+        assert.isFunction(coll.invoke);
+        
+        var firstSpy = sinon.spy(coll.at(0), 'toJSON');
+        var jsoned = coll.invoke('toJSON');
+
+        assert.equal(JSON.stringify(jsoned), '[{"name":"Alex","score":5},{"name":"Barack","score":10}]');
+      });
+
+      it('implements the aliased underscore max', function(){
+        assert.isFunction(coll.max);
+        
+        var topScorer = coll.max(function(doc){
+          return doc.get('score');
+        });
+
+        assert.equal(topScorer.get('name'), 'Barack');
+      });
+
+      it('implements the aliased underscore min', function(){
+        assert.isFunction(coll.min);
+        
+        var lowScorer = coll.min(function(doc){
+          return doc.get('score');
+        });
+
+        assert.equal(lowScorer.get('name'), 'Alex');
+      });
+
+      it('implements the aliased underscore sortBy', function(){
+        assert.isFunction(coll.sortBy);
+
+        coll.insert({ name: 'Claire', score: 1 });
+        
+        var sortedByScore = coll.sortBy(function(doc){
+          return doc.get('score');
+        });
+
+        assert.ok(sortedByScore[0].get('score') < sortedByScore[1].get('score'));
+        assert.ok(sortedByScore[1].get('score') < sortedByScore[2].get('score'));
+      });
+
+      it('implements the aliased underscore groupBy', function(){
+        assert.isFunction(coll.groupBy);
+        coll.insert({ name: 'Claire', score: 1.5 });
+        coll.insert({ name: 'Chris', score: 5.5 });
+        
+        var groupedByRoundedScore = coll.groupBy(function(doc){
+          return Math.floor(doc.get('score'));
+        });
+        assert.isTrue(_.has(groupedByRoundedScore, 1));
+        assert.isTrue(_.has(groupedByRoundedScore, 5));
+        assert.isTrue(_.has(groupedByRoundedScore, 10));
+
+        assert.lengthOf(_.keys(groupedByRoundedScore), 3);
+      });
+
+      it('implements the aliased underscore sortedIndex', function(){
+          assert.isFunction(coll.sortedIndex);
+          coll.comparator = function(person) {
+            return person.get('score');
+          };
+          var joe = coll._prepareModel({ name: 'Joe', score: 6 });
+          assert.equal(coll.sortedIndex(joe, coll.comparator), 1);
+      });
+
+      it('implements the aliased underscore shuffle', function(){
+        assert.isFunction(coll.shuffle);
+        // TODO - Assert on something guaranteed to change when shuffle is called with a two element collection
+      });
+
+      it('implements the aliased underscore toArray', function(){
+        assert.isFunction(coll.toArray);
+        var arr = coll.toArray();
+        assert.sameMembers(arr, coll.models);
+      });
+
+      it('implements the aliased underscore size', function(){
+        assert.isFunction(coll.toArray);
+        assert.equal(coll.size(), 2);
+      });
+
+      it('implements the aliased underscore first/head/take', function(){
+        assert.isFunction(coll.first);
+        assert.isFunction(coll.head);
+        assert.isFunction(coll.take);
+
+        for (var i = 0; i < 8; i++){
+          coll.insert({ name: 'Chris' });
+        };
+
+        var first = coll.first(5);
+        assert.equal(first.length, 5);
+      });
+
+      it('implements the aliased underscore initial', function(){
+        assert.isFunction(coll.initial);
+        var allButLast = coll.initial();
+        assert.equal(coll.size()-1, allButLast.length);
+        assert.equal(coll.at(0).get('name'), 'Alex');
+      });
+
+      it('implements the aliased underscore rest/tail', function(){
+        assert.isFunction(coll.rest);
+        assert.isFunction(coll.tail);
+
+        for (var i = 0; i < 10; i++){
+          coll.insert({ name: 'Chris' });
+        };
+
+        var rest = coll.rest(4);
+        assert.equal(coll.size()-4, rest.length);
+      });
+
+      it('implements the aliased underscore last', function(){
+        assert.isFunction(coll.last);
+        var last = coll.last();
+        assert.equal(coll.at(1), last);
+      });
+
+      it('implements the aliased underscore without', function(){
+        assert.isFunction(coll.without);
+        var first = coll.at(0);
+        var without = coll.without(first);
+        assert.lengthOf(without, 1);
+        assert.equal(without[0].get('name'), 'Barack');
+      });
+
+      it('implements the aliased underscore indexOf', function(){
+        assert.isFunction(coll.indexOf);
+        var last = coll.last();
+        assert.equal(coll.indexOf(last), 1);
+      });
+
+      it('implements the aliased underscore lastIndexOf', function(){
+        assert.isFunction(coll.lastIndexOf);
+
+        coll.remove({});
+
+        var chris = coll._prepareModel({ name: 'Chris', score: 6 });
+        var dave = coll._prepareModel({ name: 'Dave', score: 6 });
+
+        for (var i = 0; i < 2; i++){
+          coll.insert(chris);
+        };
+        for (var i = 0; i < 2; i++){
+          coll.insert(dave);
+        };
+
+        assert.equal(coll.lastIndexOf(chris), 2);
+      });
+
+      it('implements the aliased underscore isEmpty', function(){
+        assert.isFunction(coll.isEmpty);
+        assert.isFalse(coll.isEmpty());
+      });
+
+      it('implements the aliased underscore chain', function(){
+        assert.isFunction(coll.chain);
+        var chainable = coll.chain();
+        assert.isFunction(chainable.sort);
+      });
+    });
 	});
 });
