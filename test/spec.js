@@ -18,6 +18,8 @@ define(function(require){
 
     it('can instantiate a collection', function(){
 			assert.isDefined(coll);
+      assert.isDefined(coll.models);
+      assert.isTrue(coll instanceof Backbone.MongoCollection);
 		});
 		
     it('can insert a document', function(){
@@ -199,7 +201,13 @@ define(function(require){
       assert.equal(coll.at(1).get('name'), 'Barack');
     });
 
-    // TODO - Support for { at: __ } so this ferries models to the minimongo LocalCollection
+    it('supports the insertion of models at a particular numerical index via the { at: __ } option', function(){
+      coll.insert({ name: 'Alex', score: 5 });
+      coll.insert({ name: 'Barack', score: 5 }, { at: 0 });
+      assert.equal(coll.at(0).get('name'), 'Barack');
+      assert.equal(coll.at(1).get('name'), 'Alex');
+    });
+
     it('supports the addition of models at the end of the collection via push()', function(){
       coll.insert({ name: 'Alex', score: 5 });
       coll.push({ name: 'Barack', score: 5 });
@@ -274,30 +282,53 @@ define(function(require){
       assert.equal(coll.store.find().count(), 1);
     });
 
-    it('sorts models in the collection on insert based on a comparator if one is supplied', function(){
-      coll.comparator = function(doc){
-        return doc.get('score');
+    describe('Sorting & Comparators', function(){
+      var testSortedInsert = function(){
+        coll.insert({ name: 'Alex', score: 10 });
+        coll.insert({ name: 'Barack', score: 5 });
+
+        assert.equal(coll.at(0).get('name'), 'Barack');
+        assert.equal(coll.store.find().fetch()[0].name, 'Barack');
       };
 
-      coll.insert({ name: 'Alex', score: 10 });
-      coll.insert({ name: 'Barack', score: 5 });
+      it('sorts models in the collection on insert based on a comparator if a functional comparator with 1 arg is supplied', function(){
+        coll.comparator = function(doc){
+          return doc.get('score');
+        };
+        testSortedInsert();
+      });
 
-      assert.equal(coll.at(0).get('name'), 'Barack');
-      // assert.equal(coll.store.find().fetch()[0].name, 'Barack'); // TODO - Comparator sorting for the minimongo collection
+      it('sorts models in the collection on insert based on a comparator if a functional comparator with 1 arg is supplied', function(){
+        coll.comparator = function(a, b){
+          if (a.get('score') < b.get('score'))
+             return -1;
+          if (a.get('score') > b.get('score'))
+             return 1;
+          // a's score equals b's score
+          return 0;
+        };
+        testSortedInsert();
+      });
+
+      it('sorts models in the collection on insert with a string comparator', function(){
+        coll.comparator = 'score';
+        testSortedInsert();
+      });
+
+      it('forces a collection to resort based on the comparator when .sort() is called', function(){
+        coll.insert({ name: 'Alex', score: 10 });
+        coll.insert({ name: 'Barack', score: 5 });
+
+        coll.comparator = function(doc){
+          return doc.get('score');
+        };
+
+        assert.equal(coll.at(0).get('name'), 'Alex');
+        coll.sort();
+        assert.equal(coll.at(0).get('name'), 'Barack');
+      });
     });
 
-    it('forces a collection to resort based on the comparator when .sort() is called', function(){
-      coll.insert({ name: 'Alex', score: 10 });
-      coll.insert({ name: 'Barack', score: 5 });
-
-      coll.comparator = function(doc){
-        return doc.get('score');
-      };
-
-      assert.equal(coll.at(0).get('name'), 'Alex');
-      coll.sort();
-      assert.equal(coll.at(0).get('name'), 'Barack');
-    });
     it('grabs an subset array using the standard Backbone.Collection.pluck()', function(){
       coll.insert({ name: 'Alex', score: 10 });
       coll.insert({ name: 'Barack', score: 5 });
@@ -315,8 +346,7 @@ define(function(require){
       coll.insert({ name: 'Barack', score: 5 });
 
       var first = coll.at(0);
-      // TODO - Come back to this
-      // assert.equal(coll.findWhere({ name: 'Alex' }), first);
+      assert.equal(coll.findWhere({ name: 'Alex' }), first);
     });
 
     it('can supply a URL to each model via the Collections URL property', function(){
