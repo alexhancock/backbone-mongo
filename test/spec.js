@@ -87,6 +87,23 @@ define(function(require){
       coll.add({ name: 'Alex', score: 5 });
       assert.isTrue(setSpy.called);
     });
+
+    it('removes documents in the mongo collection as well, when remove is called', function(){
+      coll.insert({ name: 'Alex', score: 5 });
+      var first = coll.at(0);
+      coll.remove(first);
+      assert.lengthOf(coll.store.find().fetch(), 0);
+
+      coll.insert({ name: 'Alex', score: 5 });
+      coll.insert({ name: 'Alex', score: 5 });
+      coll.insert({ name: 'Alex', score: 5 });
+      coll.insert({ name: 'Alex', score: 5 });
+      coll.remove({});
+
+      // assert.lengthOf(coll.models, 0); TODO 
+      // assert.lengthOf(coll.store.find().fetch, 0);
+    });
+
     it('can use the Backbone.Collection remove implementation on documents added via insert', function(){
       coll.insert({ name: 'Alex', score: 5 });
       var first = coll.at(0);
@@ -429,14 +446,17 @@ define(function(require){
 
         assert.equal(sumOfScores, 15);
       });
-      it('does not use the default underscore aliased find - making use of the minimongo implementation instead', function(){
+
+      it('supports the default _.find as well as the mongo find() - and decides which to use which to use based on whether the first argument is a function', function(){
         assert.isFunction(coll.find);
         
-        var found = coll.find({ score: 5 });
-        assert.equal(found[0].get('score'), 5);
+        var found = coll.find(function(doc){
+          return doc.get('score') > 5;
+        });
+        assert.equal(found.get('score'), 10);
 
-        var scoresOver6 = coll.find({ score: { $gt: 6 } });
-        assert.lengthOf(found, 1);
+        found = coll.find({});
+        assert.lengthOf(found, 2);
       });
 
       it('implements the aliased underscore filter', function(){
