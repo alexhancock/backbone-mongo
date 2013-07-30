@@ -5,3 +5,40 @@ body {
   padding-top: 15px;
   margin-bottom: -25px;
 }
+.jumbotron {
+
+  background-image: -webkit-linear-gradient(rgba(0,0,0,0), rgba(0,0,0,0.15));
+  box-shadow: inset 0 0<D-R> 0 rgba(0,0,0,0.25);
+  // text-shadow: 0 1px 3px #222;
+}
+pre, code {
+  background: #F8F8FF;
+  border: 1px solid #DDD;
+  padding: 5px 10px;
+  color: black;
+  margin-bottom: 20px;
+  font-family: courier;
+  overflow: hidden;
+}
+
+:focus{outline: none;}
+.console {
+  padding: 50px 0 0 0;
+  border: 1px solid black;
+  background: black;
+  height: 135px;
+}
+.console div.line {
+  background: transparent;
+}
+.console input, .console .prompt {
+  width: 80%;
+  margin: 1px 0 1px 10px;
+  border: none;
+  display: inline;
+  padding: 2px;
+  background: black;
+  color: orange;
+  font-size: 16px;
+  font-family: Monaco, monospace;
+}

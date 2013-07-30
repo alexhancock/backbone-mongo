@@ -20,4 +20,23 @@ require(['backbone-mongo'], function(MongoCollection){
 
   collection.update({ name: 'Alex' }, { $inc: { score: 10 }, $set: { name: 'George' } }, { multi: true });
 
+  $('input[type=text]').on('keyup', function(e) {
+      if (e.which == 13){
+          e.preventDefault();
+          var command = $(e.target).val();
+          var result;
+          try {
+            var commandResult = eval(command);
+          } catch (e){
+            $('.results').html(e.toString());
+          } finally {
+            try {
+              result = JSON.stringify(commandResult, undefined, 2);
+            } catch (e){
+              result = commandResult;
+            }
+            $('.results').html(result);
+          }
+      }
+  });
 });

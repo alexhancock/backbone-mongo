@@ -38,40 +38,45 @@
   <div class="col-5 col-lg-5 ">
     <h2>It does just what you think it does...</h2>
     <p>
-      You can run mongo queries on your Backbone.Collections, even in your clientside code.
+      You can run mongo queries on your Backbone.Collections, even in your clientside code. Queries run synchronously on a completely in memory implementation of mongo.
     </p>
   </div>
 </div>
 
-<!-- <div class="row">
-  <div class="col-8 col-lg-10 col-offset-1">
-    <h2>Test Console</h2>
+<div class="row">
+  <div class="col-5 col-lg-5 col-offset-1">
+    <h2>Queries</h2>
     <p>
-      There is a global defined on this page with some data. It's called "collection". Try out a query, for example...
-      <h4>
-        <code>collection.find({ score: { $gt: 5 }});</code>
-      </h4>
-      <h4>
-        <code>collection.find({ name: "Alex" });</code>
-      </h4>
+      <pre>
+# Use any mongo query you like
+collection.find({ score: { $gt: 5 }});
+collection.find({ name: "Alex" });
+
+# Inserts and updates work as well
+collection.insert({ name: "Claire" });
+collection.update({ name: "Alex" }, { $inc: { score: 10 } });</pre>
     </p>
-    <p>Update and insert operations work as well</p>
-    <h4>
-      <code>collection.insert({ name: "Claire" });</code>
-    </h4>
-    <h4>
-      <code>collection.update({ name: "Alex" }, { $inc: { score: 10 } });</code>
-    </h4>
   </div>
-  <div class="col-8 col-lg-10 col-offset-1">
-    <div class="jumbotron" contenteditable="true">
-        // Try an example query
-        // TODO
+  <div class="col-5 col-lg-5">
+    <h2>Test console</h2>
+    <div class="console">
+     <div class="line">
+      <span class="prompt"> $</span>
+      <input type="text" placeholder="collection.find({ score: { $gt : 5 } });" />
+     </div>
     </div>
   </div>
-</div> -->
+</div>
+<div class="row">
+  <div class="col-10 col-lg-10 col-offset-1">
+    <h2>Results</h2>
+    <div class="results jumbotron">
+    </div>
+  </div>
+</div>
 
 </body>
 <script data-main="app" src="node_modules/requirejs/require.js"></script>
+<script src="http://code.jquery.com/jquery-1.10.2.min.js"></script>
 <script src="components/require-config.js"></script>
 </html>
