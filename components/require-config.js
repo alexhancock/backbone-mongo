@@ -1,20 +1,17 @@
 requirejs.config({    
   baseUrl: '/',
   paths: {
-    'underscore': 'components/underscore',
-    'backbone': 'components/backbone',
     'backbone-mongo': 'lib/backbone-mongo-collection',
     'minimongo': 'lib/minimongo',
   },
   shim: {
     'jquery': { exports: '$' },
-    'underscore': { exports: '_' },
-    'backbone': {
-      deps: ['underscore'],
-      exports: 'Backbone'
+    'ordered_dict': {
+      exports: 'OrderedDict',
     },
     'minimongo': {
-      exports: 'LocalCollection'
+      exports: 'LocalCollection',
+      deps: ['lib/deps', 'lib/ordered_dict']
     },
     'lib/synch-queue': ['lib/random'],
     'lib/oid': ['minimongo'],

@@ -157,7 +157,6 @@ define(function(require){
 
       var first = coll.at(0);
 
-
       assert.equal(first.get('name'), 'Barack');
     });
 
@@ -316,6 +315,266 @@ define(function(require){
       coll.remove(coll.at(0));
 
       assert.equal(coll.find().count(), 1);
+    });
+    describe('Observational Queries', function(){
+      it('fires "added" callbacks when documents matching a query enter the result set', function(){
+        var observeSpy = sinon.spy();
+        var cursor = coll.find({ name: 'Chris' });
+        
+        cursor.observe({
+          added: observeSpy
+        });
+
+        assert.isFalse(observeSpy.called);
+        
+        coll.insert({ name: 'Chris' });
+
+        assert.isTrue(observeSpy.called);
+      });
+
+      it('fires "removed" callbacks when documents leave the result set', function(){
+        coll.insert({ name: 'Dave', score: 11 });
+        coll.insert({ name: 'Peter', score: 11 });
+
+        var observeSpy = sinon.spy();
+        coll.find({ score: { $lt: 15 } }, { $sort: { name: -1 } }).observe({
+          removed: observeSpy
+        });
+
+        assert.isFalse(observeSpy.called);
+        coll.update({}, { $inc: { score: 5 } }, { multi: true });
+        assert.isTrue(observeSpy.called);
+      });
+
+      it('supplies "removed" callbacks with the document that used to be in the result set', function(){
+        coll.insert({ name: 'Dave', score: 11 });
+        coll.insert({ name: 'Peter', score: 11 });
+
+        var removedHook = function(doc){
+          assert.isDefined(doc);
+        };
+
+        var remSpy = sinon.spy(removedHook);
+
+        coll.find({ score: { $lt: 15 } }, { $sort: { name: -1 } }).observe({
+          removed: remSpy
+        });
+        coll.insert({ name: 'Alex', score: 11 });
+        assert.isFalse(remSpy.called);
+        coll.update({}, { $inc: { score: 5 } }, { multi: true });
+        assert.isTrue(remSpy.called);
+        assert.isTrue(remSpy.calledThrice);
+      });
+
+      it('fires "changed" callbacks when documents matching the query are modified', function(){
+        var observeSpy = sinon.spy();
+        coll.insert({ name: 'Obama', score: 5 });
+        var cursor = coll.find({ name: 'Obama' });
+        
+        cursor.observe({
+          changed: observeSpy
+        });
+
+        assert.isFalse(observeSpy.called);
+        coll.update({ name: 'Obama' }, { $set: { score: 20 } });
+        assert.isTrue(observeSpy.called);
+      });
+
+      it('supplies "changed" callbacks with the new document and the old', function(){
+        var changedCb = function(newDoc, oldDoc){
+          assert.equal(newDoc.get('score'), 20);
+          assert.equal(oldDoc.get('score'), 5);
+        };
+        var observeSpy = sinon.spy(changedCb);
+
+        coll.insert({ name: 'Obama', score: 5 });
+        var cursor = coll.find({ name: 'Obama' });
+        
+        cursor.observe({
+          changed: observeSpy
+        });
+
+        assert.isFalse(observeSpy.called);
+        coll.update({ name: 'Obama' }, { $set: { score: 20 } });
+        assert.isTrue(observeSpy.called);
+      });
+
+      it('calls changedAt callbacks when documents matching the query are modified', function(){
+        var observeSpy = sinon.spy();
+        coll.insert({ name: 'Obama', score: 5 });
+        var cursor = coll.find({ name: 'Obama' });
+        
+        cursor.observe({
+          changedAt: observeSpy
+        });
+
+        assert.isFalse(observeSpy.called);
+        coll.update({ name: 'Obama' }, { $set: { score: 20 } });
+        assert.isTrue(observeSpy.called);
+      });
+
+      it('supplies changedAt callbacks with the newDoc, oldDoc and the index of the document changed', function(){
+        var observeSpy = sinon.spy();
+        coll.insert({ name: 'Obama', score: 5 });
+        coll.insert({ name: 'Obama', score: 10 });
+        var cursor = coll.find({ name: 'Obama' });
+        
+        cursor.observe({
+          changedAt: observeSpy
+        });
+
+        assert.isFalse(observeSpy.called);
+        coll.update({ name: 'Obama' }, { $set: { score: 20 } }, { multi: true });
+        assert.isTrue(observeSpy.called);
+
+        var firstCall = observeSpy.getCall(0);
+        var secondCall = observeSpy.getCall(1);
+
+        assert.equal(firstCall.args[2], 0); // Tests that the index passed is correct
+
+        // Test that the score differs between the oldDoc and newDoc
+        assert.equal(firstCall.args[1].get('score'), 5);
+        assert.equal(firstCall.args[0].get('score'), 20);
+
+        assert.equal(secondCall.args[2], 1);
+        assert.equal(secondCall.args[1].get('score'), 10);
+        assert.equal(secondCall.args[0].get('score'), 20);
+      });
+
+      it('fires "removedAt" callbacks supplying the document and the index it was occupying', function(){
+        var observeSpy = sinon.spy();
+
+        coll.insert({ name: 'Obama' });
+        var cursor = coll.find({ name: 'Obama' });
+
+        cursor.observe({
+          removedAt: observeSpy
+        });
+
+        assert.isFalse(observeSpy.called);
+        coll.update({ name: 'Obama' }, { $set: { name: 'Biden' }});
+        assert.isTrue(observeSpy.called);
+      });
+
+      it('supplies "removedAt" callbacks with the document and the index it used to occupy in the result set', function(){
+        var removedAtHook = function(doc, idx){
+          assert.isDefined(doc);
+          assert.isDefined(idx);
+        };
+        var observeSpy = sinon.spy(removedAtHook);
+
+        coll.remove({});
+        coll.insert({ name: 'Alex' });
+        coll.insert({ name: 'Claire', score: 10 });
+        coll.insert({ name: 'Obama', score: 10 });
+        var cursor = coll.find({ score: 10 }, { sort: { name: -1 }});
+
+        cursor.observe({
+          removedAt: observeSpy
+        });
+
+        assert.isFalse(observeSpy.called);
+        coll.update({ score: 10 }, { $set: { score: 20 }}, { multi: true });
+        assert.isTrue(observeSpy.called);
+
+        assert.equal(observeSpy.getCall(0).args[1], 1);
+        assert.equal(observeSpy.getCall(1).args[1], 0);
+      });
+      it('fires "addedAt" callbacks when documents matching a query enter the result set', function(){
+        var observeSpy = sinon.spy();
+        var cursor = coll.find({ name: 'Claire' });
+        
+        cursor.observe({
+          addedAt: observeSpy
+        });
+
+        assert.isFalse(observeSpy.called);
+        coll.insert({ name: 'Claire' });
+        assert.isTrue(observeSpy.called);
+      });
+      it('supplies "addedAt" callbacks with the new model, the index it was inserted at, and the cid of the next model', function(){
+        var observeSpy = sinon.spy();
+        var cursor = coll.find({ score: 10 }, { sort: { name: 1 } });
+        
+        cursor.observe({
+          addedAt: observeSpy
+        });
+
+        assert.isFalse(observeSpy.called);
+        coll.insert({ name: 'Claire', score: 10 });
+        coll.insert({ name: 'Alex', score: 10 });
+        assert.isTrue(observeSpy.called);
+
+        var firstCall = observeSpy.getCall(0);
+        var secondCall = observeSpy.getCall(1);
+
+        // Test the models passed to the callback
+        assert.equal(firstCall.args[0].get('name'), 'Claire');
+        assert.equal(secondCall.args[0].get('name'), 'Alex');
+        
+        // Test the indexes passed to the callback
+        assert.equal(firstCall.args[1], 0);
+        assert.equal(secondCall.args[1], 0);
+
+        // Test that the before argument is passed the correct cid, or null if its at the last index
+        assert.isNull(firstCall.args[2]);
+
+        var before = coll._byId[secondCall.args[2]];
+        assert.equal(before.get('name'), 'Claire');
+      });
+
+      it('fires "movedTo" callbacks when documents matching a query move in the results', function(){
+        var observeSpy = sinon.spy();
+
+        coll.insert({ name: 'Alex' });
+        coll.insert({ name: 'Claire', score: 10 });
+        coll.insert({ name: 'Obama', score: 10 });
+        coll.insert({ name: 'Tom', score: 10 });
+        var cursor = coll.find({ score: 10 }, { sort: { name: 1 }});
+
+        cursor.observe({
+          movedTo: observeSpy
+        });
+
+        assert.isFalse(observeSpy.called);
+        coll.update({ score: 10 }, { $set: { name: 'Z' }}, { multi: true });
+        assert.isTrue(observeSpy.called);
+      });
+      it('supplies "movedTo" callbacks with the document moved, and the from and toIndexes, and the cid of the next doc', function(){
+        var observeSpy = sinon.spy();
+
+        coll.insert({ name: 'Alex' });
+        coll.insert({ name: 'Claire', score: 10 });
+        coll.insert({ name: 'Obama', score: 10 });
+        coll.insert({ name: 'Tom', score: 10 });
+        var cursor = coll.find({ score: 10 }, { sort: { name: -1 }});
+
+        cursor.observe({
+          movedTo: observeSpy
+        });
+
+        assert.isFalse(observeSpy.called);
+        coll.update({ name: 'Claire' }, { $set: { name: 'ZZ' }});
+        coll.update({ name: 'Tom' }, { $set: { name: 'Zy' }});
+        assert.isTrue(observeSpy.called);
+
+        var firstCall = observeSpy.getCall(0);
+        var secondCall = observeSpy.getCall(1);
+
+        assert.equal(firstCall.args[0].get('name'), 'ZZ');
+        assert.equal(firstCall.args[1], 2);
+        assert.equal(firstCall.args[2], 0);
+
+        var before = coll._byId[firstCall.args[3]];
+        assert.equal(before.get('name'), 'Zy');
+
+        assert.equal(secondCall.args[0].get('name'), 'Zy');
+        assert.equal(secondCall.args[1], 1);
+        assert.equal(secondCall.args[2], 0);
+
+        var before = coll._byId[secondCall.args[3]];
+        assert.equal(before.get('name'), 'ZZ');
+      });
     });
 
     describe('Cursor Operations', function(){

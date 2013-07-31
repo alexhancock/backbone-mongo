@@ -20,9 +20,13 @@ requirejs.config({
         deps: ['underscore'],
         exports: 'Backbone'
       },
+      'ordered_dict': {
+        deps: ['underscore'],
+        exports: 'OrderedDict',
+      },
       'minimongo': {
         exports: 'LocalCollection',
-        deps: ['underscore']
+        deps: ['underscore', 'lib/deps', 'lib/ordered_dict']
       },
       'sinon': {
         exports: 'sinon'
@@ -33,10 +37,12 @@ requirejs.config({
       'lib/diff': ['minimongo'],
       'lib/random': ['underscore'],
       'lib/minimongo-modify': ['minimongo'],
-      'backbone-mongo': [
+      'lib/deps': ['underscore'],
+      'backbone-mongo':[
         'underscore',
         'backbone',
         'minimongo',
+        'lib/deps',
         'lib/minimongo-modify',
         'lib/ejson',
         'lib/oid',

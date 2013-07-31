@@ -44,17 +44,34 @@ On a `Cursor`, you can perform a number of data access operations.
 * `count()` returns the number of documents that match a query.
 * `rewind()` - Resets the query cursor. You can only call `fetch`, `forEach` and `map` once on a cursor. Call `rewind` on a cursor in order to access data on it again.
 
+You can also watch a query and receive callbacks when the result set changes (documentation from [here](http://docs.meteor.com/#observe)).
+
+* `observe(callbacks)` - Takes an object with any of these methods as callbacks...
+	* `added(document)` or `addedAt(document, atIndex, before)`
+	A new document entered the result set. The new document appears at position atIndex. `before` is the cid of the next model or `null` if the new document is at the end of the results.
+
+	* `changed(newDocument, oldDocument)` or `changedAt(newDocument, oldDocument, atIndex)`
+	The contents of a document were previously oldDocument and are now newDocument. The position of the changed document is atIndex.
+
+	* `removed(oldDocument)` or `removedAt(oldDocument, atIndex)`
+	The document oldDocument is no longer in the result set. It used to be at position atIndex.
+
+	* `movedTo(document, fromIndex, toIndex, before)`
+	A document changed its position in the result set, from fromIndex to toIndex (which is before the `Backbone.Model` whose cid is before).
+
+
 ### Tests
 
-There is a suite of mocha tests, mainly testing for interoperability between the Backbone and Mongo pieces of the project, as well as regressions with the the full standard `Backbone.Collection` API.
+There is a suite of mocha tests, to decrease the likelihood of regressions against the Backbone.Collection or Minimongo APIs. To run the tests...
 
-To run the tests, just `npm install && grunt test`
-
-** You may need `grunt-cli` installed globally first
+```bash
+$ npm install -g grunt-cli
+$ npm install && grunt test
+```
 
 ### Using the library
 
-Just drop the built file at `build/backbone-mongo.js` into your page after Backbone and Underscore are loaded. It will attach a property called `Mongo` to the `Backbone` global. This is the constructor.
+Just drop the built [file](http://alexhancock.github.io/backbone-mongo/build/backbone-mongo.js) at `build/backbone-mongo.js` into your page after Backbone and Underscore are loaded. It will attach a property called `Mongo` to the `Backbone` global. This is the constructor.
 
 ### Known limitations 
 
@@ -66,12 +83,11 @@ All these things are on the Meteor team's roadmap. As they make changes to minim
 
 ### Bugs & Issues
 
-This is an early version of the project, so I'm sure there will be bugs and incompatibilities with some Backbone feature you like, or some Mongo feature you like. If you find one, I will welcome all opened issues & pull requests. If I don't respond via github, find me on twitter at @alexjhancock.
+If you find any issues, I will welcome all opened issues & pull requests. If I don't respond via github, find me on twitter at @alexjhancock.
 
 ### TODOS
 
 * Explore defining `Backbone.Models` as a [custom datatype](http://docs.meteor.com/#ejson_add_type) for EJSON, for cleaner integration with minimongo.
-* Expose observable queries, and use minimongo's `Cursor` transform function option to return `Backbone.Models`
-* Distribute project on `npm`.
+* Distribute project on `npm`
 * Reduce size of the built file, where possible
 * Add an AMD module version of the lib to the built assets

@@ -1,4 +1,5 @@
-  json = [
+define(function(){
+  var json = [
       {
           "age": 79,
           "name": "Cameron",
@@ -3978,3 +3979,5 @@
           "gender": "female"
       }
    ];
+   return json;
+});
