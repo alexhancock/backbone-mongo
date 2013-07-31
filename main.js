@@ -1,3 +1,3 @@
-require(['app'], function(app){
-  // Noop
+require(['app'], function(collection){
+  window.people = collection;
 });

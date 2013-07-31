@@ -6,14 +6,12 @@ define(function(require){
   var json = require('components/data');
   
   // Intentional global
-  collection = new MongoCollection();
-  collection.insert({ name: 'Ben', score: 3 }, { sort: true });
-  collection.insert({ name: 'Alex', score: 4 });
-  collection.insert([{ name: 'Claire', score: 5 }, { name:'Alex', score: 20 }]);
-  collection.insert({ name: 'Doug', score: 2 }, { at: 2, sort: true });
-  collection.update({ name: 'Alex' }, { $inc: { score: 10 }, $set: { name: 'George' } }, { multi: true });
-
-  collection.insert(json); // Most of the data
+  var collection = new MongoCollection();
+      collection.insert({ name: 'Alex', score: 4 });
+      collection.insert([{ name: 'Claire', score: 5 }, { name:'Alex', score: 20 }]);
+      collection.insert({ name: 'Doug', score: 2 }, { at: 2 });
+      collection.insert({ name: 'Ben', score: 3 }, { sort: true });
+      collection.insert(json); // Most of the data
 
   var query = $('#query');
 
@@ -39,5 +37,7 @@ define(function(require){
   };
 
   query.on('keyup', runQuery);
+
+  return collection;
 
 });

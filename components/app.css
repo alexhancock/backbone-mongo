@@ -1,6 +1,9 @@
 body {
   padding: 80px;
 }
+:focus{
+  outline: none;
+}
 .action_btns {
   padding-top: 15px;
   margin-bottom: -25px;
@@ -8,14 +11,12 @@ body {
 .jumbotron {
   background-image: -webkit-linear-gradient(rgba(0,0,0,0), rgba(0,0,0,0.05));
 }
-
 .left {
   padding-left: 20px;
 }
 .right {
   padding-right: 20px;
 }
-
 pre, code {
   font-family: courier;
   padding: 5px 10px;
@@ -28,11 +29,9 @@ pre, code, .console, .results, #mongo-hero {
   margin-bottom: 20px;
   overflow: hidden;
 }
-
-:focus{outline: none;}
 .console {
-  padding: 50px 0 0 0;
-  height: 138px;
+  padding: 70px 0 0 0;
+  height: 174px;
 }
 .console div.line {
   background: transparent;
@@ -48,7 +47,6 @@ pre, code, .console, .results, #mongo-hero {
   font-size: 16px;
   font-family: Monaco, monospace;
 }
-
 .results {
   min-height: 100px;
   padding: 50px;

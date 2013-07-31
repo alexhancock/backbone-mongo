@@ -1,5 +1,5 @@
 define(function(require){
-  require('backbone-mongo');
+  var Mongo = require('backbone-mongo');
 
   var sinon = require('sinon');
   var chai = require('components/chai');
@@ -9,7 +9,7 @@ define(function(require){
 	describe('Backbone.MongoCollection Tests', function(){
 
     beforeEach(function(){
-      coll = new Backbone.MongoCollection();
+      coll = new Backbone.Mongo();
     });
 
     afterEach(function(){
@@ -19,7 +19,7 @@ define(function(require){
     it('can instantiate a collection', function(){
 			assert.isDefined(coll);
       assert.isDefined(coll.models);
-      assert.isTrue(coll instanceof Backbone.MongoCollection);
+      assert.isTrue(coll instanceof Backbone.Mongo);
 		});
 		
     it('can insert a document', function(){
@@ -174,7 +174,7 @@ define(function(require){
         triggerStack.push([e, model]);
       });
 
-      coll.set([one, two]);
+      coll.set([one, two], { add: true, remove: true });
       var second = coll.at(1);
 
       assert.equal(triggerStack[0][0], 'remove');
@@ -383,7 +383,7 @@ define(function(require){
 
     it('can supply a URL to each model via the Collections URL property', function(){
       var FAKE_URL = '/users';
-      var newColl = new Backbone.MongoCollection({}, {
+      var newColl = new Backbone.Mongo([], {
         url: FAKE_URL
       });
 
@@ -391,8 +391,7 @@ define(function(require){
       newColl.insert({ name: 'Barack', score: 5 });
 
       var first = newColl.at(0);
-
-      assert.equal(first.url, FAKE_URL);
+      assert.equal(first.url(), FAKE_URL);
     });
 
     // Leaving out a test for Backbone.Collection.parse() since it's a no-op by default

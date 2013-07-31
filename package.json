@@ -1,10 +1,11 @@
 {
   "name": "backbone-mongo",
-  "version": "0.0.0",
-  "description": "An extension of Backbone Collection, query-able with the mongodb api",
-  "main": "lib/backbone-mongo-collection.js",
+  "version": "0.0.01",
+  "description": "Query your Backbone.Collections with the MongoDB API",
+  "main": "build/backbone-mongo.js",
   "directories": {
-    "test": "test"
+    "test": "test",
+    "build": "build"
   },
   "scripts": {
     "test": "./node_modules/.bin/karma start test/karma.conf.js --single-run --browsers PhantomJS"
@@ -21,7 +22,7 @@
     "meteor"
   ],
   "author": "Alex J Hancock",
-  "license": "BSD",
+  "license": "MIT",
   "bugs": {
     "url": "https://github.com/alexhancock/backbone-mongo/issues"
   },
@@ -30,6 +31,7 @@
     "grunt": "~0.4.1",
     "grunt-karma": "~0.4.5",
     "karma": "~0.8.7",
-    "requirejs": "~2.1.8"
+    "requirejs": "~2.1.8",
+    "grunt-contrib-requirejs": "~0.4.1"
   }
 }

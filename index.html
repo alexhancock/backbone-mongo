@@ -48,13 +48,15 @@
     <h2>Queries</h2>
     <p>
       <pre>
+var people = new Backbone.Mongo();
+
 # Use any mongo query you like
-var highScorers = collection.find({ score: { $gt: 5 }});
-var alexes = collection.find({ name: "Alex" });
+var highScorers = people.find({ score: { $gt: 50 }});
+var obama = people.find({ name: "Barack" });
 
 # Inserts and updates work as well
-collection.insert({ name: "Claire" });
-collection.update({ name: "Alex" }, { $inc: { score: 10 } });</pre>
+people.insert({ name: "Claire" });
+people.update({ name: "Alex" }, { $inc: { score: 10 } });</pre>
     </p>
   </div>
   <div class="col-6 col-lg-6 right">
@@ -62,7 +64,7 @@ collection.update({ name: "Alex" }, { $inc: { score: 10 } });</pre>
     <div class="console">
      <div class="line">
       <span class="prompt"> $</span>
-      <input type="text" id="query" placeholder="collection.find({ score: { $gt : 5 } });" />
+      <input type="text" id="query" placeholder="people.find({ score: { $gt : 5 } });" />
      </div>
     </div>
   </div>
