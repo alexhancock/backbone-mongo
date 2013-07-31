@@ -50,11 +50,11 @@
       <pre>
 var people = new Backbone.Mongo();
 
-# Use any mongo query you like
+// Use any mongo query you like
 var highScorers = people.find({ score: { $gt: 50 }});
 var obama = people.find({ name: "Barack" });
 
-# Inserts and updates work as well
+// Inserts and updates work as well
 people.insert({ name: "Claire" });
 people.update({ name: "Alex" }, { $inc: { score: 10 } });</pre>
     </p>
@@ -71,7 +71,7 @@ people.update({ name: "Alex" }, { $inc: { score: 10 } });</pre>
 </div>
 <div class="row">
   <div class="col-12 col-lg-12">
-    <h2>Console Query Result</h2>
+    <h2>Query Result</h2>
     <div class="results">
     </div>
   </div>

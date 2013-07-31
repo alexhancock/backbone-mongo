@@ -19,7 +19,7 @@ body {
 }
 pre, code {
   font-family: courier;
-  padding: 5px 10px;
+  padding: 15px;
 }
 pre, code, .console, .results, #mongo-hero {
   background: #F8F8FF;
@@ -30,8 +30,8 @@ pre, code, .console, .results, #mongo-hero {
   overflow: hidden;
 }
 .console {
-  padding: 70px 0 0 0;
-  height: 174px;
+  padding: 80px 0 0 0;
+  height: 195px;
 }
 .console div.line {
   background: transparent;
@@ -43,7 +43,7 @@ pre, code, .console, .results, #mongo-hero {
   display: inline;
   padding: 2px;
   background: transparent;
-  color: orange;
+  color: #428bca;
   font-size: 16px;
   font-family: Monaco, monospace;
 }
