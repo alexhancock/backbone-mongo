@@ -90,8 +90,10 @@ define(function(require){
 
     it('removes documents in the mongo collection as well, when remove is called', function(){
       coll.insert({ name: 'Alex', score: 5 });
+      coll.insert({ name: 'Alex', score: 5 });
       var first = coll.at(0);
-      coll.remove(first);
+      var second = coll.at(1);
+      coll.remove([first, second]);
       assert.lengthOf(coll.store.find().fetch(), 0);
 
       coll.insert({ name: 'Alex', score: 5 });
@@ -100,11 +102,12 @@ define(function(require){
       coll.insert({ name: 'Alex', score: 5 });
       coll.remove({});
 
-      // assert.lengthOf(coll.models, 0); TODO 
-      // assert.lengthOf(coll.store.find().fetch, 0);
+      assert.lengthOf(coll.models, 0);
+      assert.lengthOf(coll.store.find().fetch, 0);
     });
 
     it('can use the Backbone.Collection remove implementation on documents added via insert', function(){
+      coll.reset();
       coll.insert({ name: 'Alex', score: 5 });
       var first = coll.at(0);
       coll.remove(first);
@@ -119,9 +122,10 @@ define(function(require){
         assert.isDefined(model.get('score'));
       });
 
-      coll.remove(coll.at(0));
-      assert.isTrue(triggerStub.called);
+      var first = coll.at(0);
 
+      coll.remove(first);
+      assert.isTrue(triggerStub.called);
       triggerStub.restore();
     });
 
@@ -148,7 +152,17 @@ define(function(require){
       assert.equal(coll.store.find().fetch()[0].name, 'Barack');
     });
 
+    it('supports the mongo updates for individual properties and ports changes to the backbone.models array', function(){
+      coll.insert({ name: 'Alex', score: 5 });
+      coll.update({ name: 'Alex' }, { $set: { name: 'Barack' } });
+
+      var first = coll.at(0);
+      assert.equal(first.get('name'), 'Barack');
+    });
+
+
     it('adds/removes models intelligently when .set() is called', function(){
+      coll.reset();
       var one = { name: 'Alex' };
       var two = { name: 'Claire' };
 
@@ -161,6 +175,7 @@ define(function(require){
       });
 
       coll.set([one, two]);
+      var second = coll.at(1);
 
       assert.equal(triggerStack[0][0], 'remove');
       assert.equal(triggerStack[0][1], first);
@@ -652,9 +667,6 @@ define(function(require){
 
       it('implements the aliased underscore lastIndexOf', function(){
         assert.isFunction(coll.lastIndexOf);
-
-        coll.remove({});
-
         var chris = coll._prepareModel({ name: 'Chris', score: 6 });
         var dave = coll._prepareModel({ name: 'Dave', score: 6 });
 
