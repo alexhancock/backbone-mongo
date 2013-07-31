@@ -9,7 +9,7 @@
 <div class="jumbotron" id="mongo-hero">
   <div class="row">
     <div class="col-9 col-lg-9">
-      <h1>Backbone.MongoCollection</h1>
+      <h1>Backbone.Mongo</h1>
     </div>
    <div class="col-3 col-lg-3">
       <p class="action_btns">
@@ -22,21 +22,21 @@
     <div class="col-8 col-lg-10" id="desc">
       <p>
         <img src="https://magnum.travis-ci.com/alexhancock/backbone-mongo.png?token=AqmVkZFx1y67sssTsTY1&branch=master"></img>
-        Query your Backbone.Collections with the MongoDB API, client or server side.
+        Query your Backbone.Collections with the MongoDB API
       </p>
     </div>
   </div>
 </div>
 <div class="row">
-  <div class="col-5 col-lg-5 col-offset-1">
+  <div class="col-6 col-lg-6 left">
     <h2>This project is glue between...</h2>
     <ul>
-      <li>Minimongo - by the Meteor team</li>
-      <li>Backbone.Collections</li>
+      <li><a target="_blank" href="https://github.com/meteor/meteor/tree/master/packages/minimongo">Minimongo</a> - by the <a target="_blank" href="http://meteor.com">Meteor</a> team</li>
+      <li><a href="http://backbonejs.org/#Collection">Backbone.Collections</a></li>
     </ul>
   </div>
-  <div class="col-5 col-lg-5 ">
-    <h2>It does just what you think it does...</h2>
+  <div class="col-6 col-lg-6 right">
+    <h2>Run Mongo queries in the browser</h2>
     <p>
       You can run mongo queries on your Backbone.Collections, even in your clientside code. Queries run synchronously on a completely in memory implementation of mongo.
     </p>
@@ -44,39 +44,37 @@
 </div>
 
 <div class="row">
-  <div class="col-5 col-lg-5 col-offset-1">
+  <div class="col-6 col-lg-6 left">
     <h2>Queries</h2>
     <p>
       <pre>
 # Use any mongo query you like
-collection.find({ score: { $gt: 5 }});
-collection.find({ name: "Alex" });
+var highScorers = collection.find({ score: { $gt: 5 }});
+var alexes = collection.find({ name: "Alex" });
 
 # Inserts and updates work as well
 collection.insert({ name: "Claire" });
 collection.update({ name: "Alex" }, { $inc: { score: 10 } });</pre>
     </p>
   </div>
-  <div class="col-5 col-lg-5">
+  <div class="col-6 col-lg-6 right">
     <h2>Test console</h2>
     <div class="console">
      <div class="line">
       <span class="prompt"> $</span>
-      <input type="text" placeholder="collection.find({ score: { $gt : 5 } });" />
+      <input type="text" id="query" placeholder="collection.find({ score: { $gt : 5 } });" />
      </div>
     </div>
   </div>
 </div>
 <div class="row">
-  <div class="col-10 col-lg-10 col-offset-1">
+  <div class="col-12 col-lg-12">
     <h2>Console Query Result</h2>
-    <div class="results jumbotron">
+    <div class="results">
     </div>
   </div>
 </div>
-
 </body>
-<script data-main="app" src="node_modules/requirejs/require.js"></script>
-<script src="http://code.jquery.com/jquery-1.10.2.min.js"></script>
+<script data-main="main" src="node_modules/requirejs/require.js"></script>
 <script src="components/require-config.js"></script>
 </html>

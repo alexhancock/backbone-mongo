@@ -9,23 +9,31 @@ body {
   background-image: -webkit-linear-gradient(rgba(0,0,0,0), rgba(0,0,0,0.05));
   // text-shadow: 0 1px 3px #222;
 }
+
+.left {
+  padding-left: 20px;
+}
+.right {
+  padding-right: 20px;
+}
+
 pre, code {
+  font-family: courier;
+  padding: 5px 10px;
+}
+pre, code, .console, .results, #mongo-hero {
   background: #F8F8FF;
   border: 1px solid #DDD;
-  padding: 5px 10px;
+  border-radius: 10px;
   color: black;
   margin-bottom: 20px;
-  font-family: courier;
   overflow: hidden;
 }
 
 :focus{outline: none;}
 .console {
   padding: 50px 0 0 0;
-  border: 1px solid black;
-  background: black;
   height: 138px;
-  border-radius: 4px;
 }
 .console div.line {
   background: transparent;
@@ -36,8 +44,13 @@ pre, code {
   border: none;
   display: inline;
   padding: 2px;
-  background: black;
+  background: transparent;
   color: orange;
   font-size: 16px;
   font-family: Monaco, monospace;
+}
+
+.results {
+  min-height: 100px;
+  padding: 50px;
 }

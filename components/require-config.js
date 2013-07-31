@@ -5,12 +5,13 @@ requirejs.config({
     'backbone': 'components/backbone',
     'backbone-mongo': 'lib/backbone-mongo-collection',
     'minimongo': 'lib/minimongo',
-    'sinon': 'components/sinon'
+    'sinon': 'components/sinon',
+    'jquery': 'components/jquery'
   },
   shim: {
-    'underscore': {
-      exports: '_'
-    },
+    'jquery': { exports: '$' },
+    'underscore': { exports: '_' },
+    'sinon': { exports: 'sinon' },
     'backbone': {
       deps: ['underscore'],
       exports: 'Backbone'
@@ -18,9 +19,6 @@ requirejs.config({
     'minimongo': {
       exports: 'LocalCollection',
       deps: ['underscore']
-    },
-    'sinon': {
-      exports: 'sinon'
     },
     'lib/synch-queue': ['lib/random'],
     'lib/oid': ['minimongo'],

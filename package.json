@@ -29,6 +29,7 @@
     "grunt-cli": "~0.1.9",
     "grunt": "~0.4.1",
     "grunt-karma": "~0.4.5",
-    "karma": "~0.8.7"
+    "karma": "~0.8.7",
+    "requirejs": "~2.1.8"
   }
 }
