@@ -7,11 +7,11 @@ define(function(require){
   
   // Intentional global
   var collection = new MongoCollection();
-      collection.insert({ name: 'Alex', score: 4 });
-      collection.insert([{ name: 'Claire', score: 5 }, { name:'Alex', score: 20 }]);
-      collection.insert({ name: 'Doug', score: 2 }, { at: 2 });
-      collection.insert({ name: 'Ben', score: 3 }, { sort: true });
-      collection.insert(json); // Most of the data
+  collection.insert({ name: 'Alex', score: 4 });
+  collection.insert([{ name: 'Claire', score: 5 }, { name:'Alex', score: 20 }]);
+  collection.insert({ name: 'Claire', score: 2 }, { at: 2 });
+  collection.insert({ name: 'Ben', score: 3 }, { sort: true });
+  collection.insert(json); // Most of the data
 
   var query = $('#query');
 

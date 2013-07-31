@@ -51,8 +51,8 @@
 var people = new Backbone.Mongo();
 
 // Use any mongo query you like
-var highScorers = people.find({ score: { $gt: 50 }});
-var obama = people.find({ name: "Barack" });
+var highScorers = people.find({ score: { $gt: 50 }}).fetch();
+var obama = people.find({ name: "Barack" }).fetch();
 
 // Inserts and updates work as well
 people.insert({ name: "Claire" });
@@ -64,7 +64,7 @@ people.update({ name: "Alex" }, { $inc: { score: 10 } });</pre>
     <div class="console">
      <div class="line">
       <span class="prompt"> $</span>
-      <input type="text" id="query" placeholder="people.find({ score: { $gt : 5 } });" />
+      <input type="text" id="query" placeholder="people.find({ name: 'Alex'}).fetch();" />
      </div>
     </div>
   </div>

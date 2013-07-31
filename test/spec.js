@@ -24,12 +24,12 @@ define(function(require){
 		
     it('can insert a document', function(){
       coll.insert({ name: 'Alex' });
-      assert.equal(coll.find().length, 1);
+      assert.equal(coll.find().fetch().length, 1);
 		});
 
     it('can insert an array of document', function(){
       coll.insert([{ name: 'Alex' }, { name: 'Claire' }]);
-      assert.equal(coll.find().length, 2);
+      assert.equal(coll.find().fetch().length, 2);
 		});
 
     it('maintains an array representation of all documents in the collection on the models property', function(){
@@ -68,7 +68,7 @@ define(function(require){
       coll.add({ name: 'Alex', score: 5 });
       coll.add({ name: 'Claire', score: 10 });
 
-      var res = coll.find({ score: { $gt: 6 } });
+      var res = coll.find({ score: { $gt: 6 } }).fetch();
       assert.lengthOf(res, 1);
     });
     it('can add models via mongo style insert and then access them with Backbone at() and findWhere()', function(){
@@ -94,7 +94,7 @@ define(function(require){
       var first = coll.at(0);
       var second = coll.at(1);
       coll.remove([first, second]);
-      assert.lengthOf(coll.store.find().fetch(), 0);
+      assert.lengthOf(coll.find().fetch(), 0);
 
       coll.insert({ name: 'Alex', score: 5 });
       coll.insert({ name: 'Alex', score: 5 });
@@ -103,7 +103,7 @@ define(function(require){
       coll.remove({});
 
       assert.lengthOf(coll.models, 0);
-      assert.lengthOf(coll.store.find().fetch, 0);
+      assert.lengthOf(coll.find().fetch, 0);
     });
 
     it('can use the Backbone.Collection remove implementation on documents added via insert', function(){
@@ -134,13 +134,13 @@ define(function(require){
 
       coll.reset();
 
-      assert.lengthOf(coll.store.find().fetch(), 0);
+      assert.lengthOf(coll.find().fetch(), 0);
       assert.lengthOf(coll.models, 0);
     });
 
     it('supports use of the standard Backbone.Collection reset to bootstrap the content of both the models array and the LocalCollection', function(){
       coll.reset([{ name: 'Alex', score: 5 }, { name: 'Claire', score: 10 }]);
-      assert.lengthOf(coll.store.find().fetch(), 2);
+      assert.lengthOf(coll.find().fetch(), 2);
       assert.lengthOf(coll.models, 2);
     });
     it('supports the standard Backbone.Collection set for individual properties and ports changes in the LocalCollection as well', function(){
@@ -149,7 +149,7 @@ define(function(require){
       var first = coll.at(0);
       first.set('name', 'Barack');
 
-      assert.equal(coll.store.find().fetch()[0].name, 'Barack');
+      assert.equal(coll.find().fetch()[0].get('name'), 'Barack');
     });
 
     it('supports the mongo updates for individual properties and ports changes to the backbone.models array', function(){
@@ -157,6 +157,8 @@ define(function(require){
       coll.update({ name: 'Alex' }, { $set: { name: 'Barack' } });
 
       var first = coll.at(0);
+
+
       assert.equal(first.get('name'), 'Barack');
     });
 
@@ -204,7 +206,7 @@ define(function(require){
 
       assert.equal(me.id, 'A01');
     });
-    it('saves only CIDs + the attributes hash on the object that ends up in minimongo', function(){
+    it('saves only CIDs + the attributes hash on the object that ends up in minimongo, but returns the actual Backbone.Model on fetch()', function(){
       var Person = Backbone.Model.extend({
         idAttribute: '_id',
       });
@@ -212,7 +214,10 @@ define(function(require){
       var me = new Person({ _id: 'A01', name: 'Alex' });
       coll.insert(me);
 
-      assert.sameMembers(["_id", "name", "cid"], _.keys(coll.store.find().fetch()[0]));
+      // TODO - Fix coll.store(direct).find/findOne calls
+      //var inMongo = coll.store.findOne({ cid: me.cid });
+
+      assert.equal(me, coll.find().fetch()[0]);
     });
 
     it('maintains the standard "changed" hash on each model containing attributes modified by a mongo update() since the last "change" event was triggered', function(){
@@ -262,7 +267,7 @@ define(function(require){
       assert.equal(last, coll.pop());
 
       assert.equal(coll.models.length, 1);
-      assert.equal(coll.find().length, 1);
+      assert.equal(coll.find().fetch().length, 1);
     });
 
     it('removes and returns the first model in the collection via shift()', function(){
@@ -274,7 +279,7 @@ define(function(require){
       assert.equal(first, coll.shift());
 
       assert.equal(coll.models.length, 1);
-      assert.equal(coll.find().length, 1);
+      assert.equal(coll.find().fetch().length, 1);
     });
 
     it('return a shallow copy of the models in the array from specific index via slice()', function(){
@@ -304,14 +309,14 @@ define(function(require){
 
     it('keeps the count returned from the minimongo cursor up to date taking into account mongo and standard Backbone operations', function(){
       coll.insert({ name: 'Alex', score: 5 });
-      assert.equal(coll.store.find().count(), 1);
+      assert.equal(coll.find().count(), 1);
 
       coll.add({ name: 'Claire', score: 5 });
-      assert.equal(coll.store.find().count(), 2);
+      assert.equal(coll.find().count(), 2);
 
       coll.remove(coll.at(0));
 
-      assert.equal(coll.store.find().count(), 1);
+      assert.equal(coll.find().count(), 1);
     });
 
     describe('Sorting & Comparators', function(){
@@ -320,7 +325,7 @@ define(function(require){
         coll.insert({ name: 'Barack', score: 5 });
 
         assert.equal(coll.at(0).get('name'), 'Barack');
-        assert.equal(coll.store.find().fetch()[0].name, 'Barack');
+        assert.equal(coll.find().fetch()[0].get('name'), 'Barack');
       };
 
       it('sorts models in the collection on insert based on a comparator if a functional comparator with 1 arg is supplied', function(){
@@ -403,7 +408,7 @@ define(function(require){
       var newColl = coll.clone();
       
       assert.lengthOf(newColl.models, 2);
-      assert.lengthOf(newColl.find(), 2);
+      assert.lengthOf(newColl.find().fetch(), 2);
     });
     it('calls the collection sync() function when fetch() is called', function(){
       var syncStub = sinon.stub(Backbone, 'sync');
@@ -413,7 +418,7 @@ define(function(require){
     });
     it('supports the create() convenience function to add a new instance of a model within the collection', function(){
       coll.create({ name: 'Alex', score: 10 });
-      assert.equal(coll.store.find().count(), 1);
+      assert.equal(coll.find().count(), 1);
       assert.equal(coll.models.length, 1);
     });
 
@@ -469,7 +474,7 @@ define(function(require){
         });
         assert.equal(found.get('score'), 10);
 
-        found = coll.find({});
+        found = coll.find({}).fetch();
         assert.lengthOf(found, 2);
       });
 
