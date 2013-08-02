@@ -4,6 +4,8 @@
 
 ### Query your ```Backbone.Collection```s with the MongoDB API.
 
+### [Live Demo](http://alexhancock.github.io/backbone-mongo/)
+
 ##### This project is glue between...
 
 * [Minimongo](https://github.com/meteor/meteor/tree/master/packages/minimongo) - by the [Meteor](http://meteor.com) team
@@ -50,6 +52,10 @@ To run the tests, just `npm install && grunt test`
 
 ** You may need `grunt-cli` installed globally first
 
+### Using the library
+
+Just drop the built file at `build/backbone-mongo.js` into your page after Backbone and Underscore are loaded. It will attach a property called `Mongo` to the `Backbone` global. This is the constructor.
+
 ### Known limitations 
 
 * $pull in modifiers can only accept certain kinds of selectors.
@@ -67,3 +73,5 @@ This is an early version of the project, so I'm sure there will be bugs and inco
 * Explore defining `Backbone.Models` as a [custom datatype](http://docs.meteor.com/#ejson_add_type) for EJSON, for cleaner integration with minimongo.
 * Expose observable queries, and use minimongo's `Cursor` transform function option to return `Backbone.Models`
 * Distribute project on `npm`.
+* Reduce size of the built file, where possible
+* Add an AMD module version of the lib to the built assets
