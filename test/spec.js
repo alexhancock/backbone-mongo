@@ -319,6 +319,56 @@ define(function(require){
       assert.equal(coll.find().count(), 1);
     });
 
+    describe('Cursor Operations', function(){
+      var cursor;
+      beforeEach(function(){
+        coll.insert({ name: 'Barack Obama' });
+        coll.insert({ name: 'Jack Lew' });
+        coll.insert({ name: 'John Kerry' });
+        cursor = coll.find();
+      });
+      afterEach(function(){
+        cursor.rewind();
+      });
+
+      it('returns an array of Backbone Models when fetch() is called', function(){
+        var fetched = cursor.fetch();
+        assert.isArray(fetched);
+        assert.instanceOf(fetched[0], Backbone.Model);
+      });
+      it('calls a callback once for each matching document when forEach is called', function(){
+        var cbSpy = sinon.spy();
+        coll.forEach(cbSpy);
+        assert.isTrue(cbSpy.called);
+        assert.isTrue(cbSpy.calledThrice);
+      });
+
+      it('calls a callback once for each matching document when map is called, and returns an array', function(){
+        var cbSpy = sinon.spy();
+
+        var res = coll.map(cbSpy);
+        assert.isTrue(cbSpy.called);
+        assert.isTrue(cbSpy.calledThrice);
+
+        assert.isArray(res); // This will be an array of null vals because the spy doesn't return each doc
+      });
+      it('returns the number of docs in the collection from .count()', function(){
+        assert.equal(cursor.count(), 3);
+      });
+      it('allows for access of data more than once on a cursor after rewind is called', function(){
+        var newCursor = coll.find();
+
+        var res = newCursor.fetch();
+        var secondRes = newCursor.fetch();
+
+        assert.lengthOf(secondRes, 0);
+        newCursor.rewind();
+
+        secondRes = newCursor.fetch();
+        assert.lengthOf(secondRes, 3);
+      });
+    });
+
     describe('Sorting & Comparators', function(){
       var testSortedInsert = function(){
         coll.insert({ name: 'Alex', score: 10 });
