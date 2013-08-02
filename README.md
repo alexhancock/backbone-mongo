@@ -4,35 +4,49 @@
 
 ### Query your ```Backbone.Collection```s with the MongoDB API.
 
-### This project is glue between...</h2>
-<ul>
-<li><a target="_blank" href="https://github.com/meteor/meteor/tree/master/packages/minimongo">Minimongo</a> - by the <a target="_blank" href="http://meteor.com">Meteor</a> team</li>
-<li><a href="http://backbonejs.org/#Collection">Backbone.Collections</a></li>
-</ul>
+### This project is glue between
+
+* [Minimongo](https://github.com/meteor/meteor/tree/master/packages/minimongo) - by the [Meteor](http://meteor.com) team
+* [Backbone.Collections](http://backbonejs.org/#Collection)
 
 ```javascript
 var people = new Backbone.Mongo();
 
 // Use any mongo query you like
-var highScorers = people.find({ score: { $gt: 50 }});
-var obama = people.find({ name: "Barack" });
+var highScorers = people.find({ score: { $gt: 50 }}).fetch();
+var obama = people.find({ name: "Barack" }).fetch();
 
 // Inserts and updates work as well
 people.insert({ name: "Claire" });
 people.update({ name: "Alex" }, { $inc: { score: 10 } });
 ```
 
-### Tests
-
-There is a suite of mocha tests mainly testing for interoperability between the Backbone and Mongo pieces of the project, as well as just regressions with the the full standard Backbone.Collections API.
-
-To run the tests, just `npm install && grunt test`
-
-** You may need `grunt-cli` installed globally first
-
 ### API
 
-Calling `find(sel)` where `sel` is a mongo selector will synchronously return the set of matching `Backbone.Model`s in a plain array.
+This project is an extension of `Backbone.Collection`, thus it's entire API is supported and support for mongo operations and queries has been added.
+
+* Calling `find(sel)` where `sel` is a mongo selector will return a `Cursor`.
+* Calling `findOne(sel)` returns the first document which matches the query.
+* Calling `insert(doc)` will add a `Backbone.Model` representation of the document to the collection.
+* Calling `update(sel, mod)` with a selector and modifier, will apply the modifier to the documents matched by the selector. Check [here](http://docs.mongodb.org/manual/core/update/#update-operators) for a full list of mongo modifiers.
+* Calling `remove(sel)` will remove the matching documents. Calling it with an empty object will empty the collection.
+
+#### Cursors
+
+On a `Cursor`, you can perform a number of data access operations.
+
+* `fetch()` - Synchronously returns you the matching documents in the collection as an array of Backbone.Models
+* `forEach(cb)` - Call `cb` once for each matching document, sequentially and synchronously
+* `map(cb)` - Map callback over all matching documents. Returns an Array
+* `count()` returns the number of documents that match a query.
+* `rewind()` - Resets the query cursor. You can only call `fetch`, `forEach` and `map` once on a cursor. Call `rewind` on a cursor in order to access data on it again.
+
+### Tests
+
+There is a suite of mocha tests, mainly testing for interoperability between the Backbone and Mongo pieces of the project, as well as regressions with the the full standard `Backbone.Collection` API.
+
+To run the tests, just `npm install && grunt test`
+** You may need `grunt-cli` installed globally first
 
 ### Known limitations 
 
@@ -40,20 +54,13 @@ Calling `find(sel)` where `sel` is a mongo selector will synchronously return th
 * $ to denote the matched array position is not supported in modifier.
 * findAndModify, upsert, aggregate functions, and map/reduce aren't yet supported.
 
-All these things are on the meteor team's roadmap to work on, and as they make changes to minimongo, I will port the changes into this project.
+All these things are on the Meteor team's roadmap to work on, and as they make changes to minimongo, I will port the changes into this project.
 
 ### Bugs & Issues
 
 This is an early version of the project, so I'm sure there will be bugs and incompatibilities with some Backbone feature you like, or some Mongo feature you like. If you find one, file an issue / open a pull request. If I don't respond via github, find me on twitter at @alexjhancock.
 
-### Direct access
+## TODOS
 
-If you wish, you can access the underlying `minimongo` collection by referencing `collectionName.store`.
-
-On this object...
-
-* `.find()` returns a cursor
-* With this cursor, you can run `.fetch()` to grab an array of matching documents, or `.map(itr)` or `.forEach(itr)`.
-* There is support for observable queries (run a callback when someone enters/leaves the result set of a query) as well, but I plan on exposing it in a more standard way later. For now, you can read [this](http://docs.meteor.com/#observe) and play around on your own.
-
-** Be careful, because any update operations you perform by calling update on the `store` property directly will not be reflected on the actual `Backbone.Models`. Calling `collectionName.update(mod)` with your modifier is what you want to do.
+* Explore defining `Backbone.Models` as a [custom datatype](http://docs.meteor.com/#ejson_add_type) for EJSON, for cleaner integration with minimongo.
+* Expose observable queries, and use minimongo's `Cursor` transform function option to return `Backbone.Models`
