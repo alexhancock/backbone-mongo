@@ -1,6 +1,6 @@
 # Backbone.Mongo
 
-[![Build Status](https://travis-ci.com/alexhancock/backbone-mongo.png)](https://travis-ci.com/alexhancock/backbone-mongo)
+[![Build Status](https://travis-ci.org/alexhancock/backbone-mongo.png?branch=master)](https://travis-ci.org/alexhancock/backbone-mongo)
 
 ### Query your ```Backbone.Collection```s with the MongoDB API.
 

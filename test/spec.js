@@ -1,6 +1,5 @@
 define(function(require){
-  var Mongo = require('backbone-mongo');
-
+  Backbone.Mongo = require('backbone-mongo');
   var sinon = require('sinon');
   var chai = require('components/chai');
   var assert = chai.assert;

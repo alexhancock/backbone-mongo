@@ -33,8 +33,7 @@ requirejs.config({
       'lib/diff': ['minimongo'],
       'lib/random': ['underscore'],
       'lib/minimongo-modify': ['minimongo'],
-      'backbone-mongo': {
-        deps [
+      'backbone-mongo': [
         'underscore',
         'backbone',
         'minimongo',
