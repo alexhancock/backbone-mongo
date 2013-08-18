@@ -1,5 +1,5 @@
 requirejs.config({    
-  baseUrl: '/',
+  baseUrl: '',
   paths: {
     'backbone-mongo': 'lib/backbone-mongo-collection',
     'minimongo': 'lib/minimongo',
